@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신제품 기획 아카이브</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', sans-serif; background: #f7f7f5; color: #1a1a1a; font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+  /* Layout */
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* Header */
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+  .page-title { font-size: 24px; font-weight: 600; color: #111; display: flex; align-items: center; gap: 8px; }
+  .page-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; }
+  .b-pink { background: #fde8ef; color: #a0325a; }
+  .b-teal { background: #e0f5ee; color: #0d6b52; }
+  .b-gray { background: #efefed; color: #666; }
+  .add-btn { font-size: 13px; padding: 7px 16px; border-radius: 8px; border: 1px solid #c8dff8; background: #eaf2fd; color: #1a5fa8; cursor: pointer; font-weight: 500; white-space: nowrap; }
+  .add-btn:hover { background: #d8eafc; }
+
+  /* Product tabs */
+  .prod-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .prod-tab { font-size: 13px; padding: 6px 16px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #666; cursor: pointer; transition: all .15s; }
+  .prod-tab.on { background: #eaf2fd; color: #1a5fa8; border-color: #b5d4f4; font-weight: 500; }
+  .prod-tab:hover:not(.on) { background: #f2f2f0; }
+
+  hr.div { border: none; border-top: 1px solid #e8e8e6; margin: 0 0 20px; }
+
+  /* Overview cards */
+  .overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  .ov-card { background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; padding: 14px 16px; }
+  .ov-label { font-size: 11px; color: #999; margin-bottom: 5px; }
+  .ov-val { font-size: 18px; font-weight: 600; color: #111; }
+  .ov-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
+
+  /* Section label */
+  .sec-label { font-size: 11px; font-weight: 600; color: #aaa; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+
+  /* Timeline bar */
+  .tl-bar { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin-bottom: 10px; }
+  .tl-seg { height: 6px; border-radius: 3px; }
+  .tl-done { background: #1a9e74; }
+  .tl-ip { background: #e8970e; }
+  .tl-pend { background: #d5d5d0; }
+
+  /* Process grid */
+  .proc-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-bottom: 20px; }
+  .proc-card { border-radius: 8px; border: 1px solid #e0e0dc; background: #fff; padding: 10px 8px 8px; cursor: pointer; transition: all .12s; }
+  .proc-card:hover { background: #f7f7f5; }
+  .proc-card.on { border-color: #91c3f0; background: #eaf2fd; }
+  .pc-num { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px; display: inline-block; margin-bottom: 5px; }
+  .done .pc-num { background: #e0f5ee; color: #0d6b52; }
+  .ip .pc-num { background: #fdf0d8; color: #a06a00; }
+  .pend .pc-num { background: #efefed; color: #999; }
+  .pc-name { font-size: 11px; font-weight: 500; color: #333; line-height: 1.3; margin-bottom: 3px; }
+  .pc-st { font-size: 10px; color: #bbb; }
+
+  /* Detail area */
+  .detail { border: 1px solid #e0e0dc; border-radius: 12px; background: #fff; padding: 20px 22px; }
+  .detail-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 8px; }
+  .detail-title { font-size: 16px; font-weight: 600; color: #111; display: flex; align-items: center; gap: 8px; }
+  .guide-btn { font-size: 12px; padding: 6px 13px; border-radius: 7px; border: 1px solid #c8dff8; background: #eaf2fd; color: #1a5fa8; cursor: pointer; }
+  .guide-btn:hover { background: #d8eafc; }
+  .detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field-box { background: #f7f7f5; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+  .field-label { font-size: 11px; color: #aaa; margin-bottom: 3px; }
+  .field-val { font-size: 13px; color: #222; line-height: 1.5; }
+  .note-box { border-left: 2px solid #91c3f0; padding: 10px 13px; background: #eaf2fd; border-radius: 0 8px 8px 0; font-size: 13px; color: #1a5fa8; line-height: 1.6; margin-bottom: 12px; }
+  .file-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid #e8e8e6; border-radius: 7px; font-size: 12px; color: #666; cursor: pointer; margin-bottom: 5px; }
+  .file-item:hover { background: #f7f7f5; }
+  .action-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 16px; border-top: 1px solid #f0f0ee; padding-top: 14px; }
+  .act-btn { font-size: 12px; padding: 6px 13px; border-radius: 7px; border: 1px solid #e0e0dc; background: #fff; color: #555; cursor: pointer; }
+  .act-btn:hover { background: #f7f7f5; }
+
+  /* Plan version table */
+  .plan-table-wrap { overflow-x: auto; margin-bottom: 14px; }
+  .plan-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .plan-table th { background: #f2f2f0; font-weight: 500; color: #888; text-align: left; padding: 8px 12px; border-bottom: 1px solid #e0e0dc; font-size: 11px; }
+  .plan-table th:first-child { border-radius: 8px 0 0 0; }
+  .plan-table th:last-child { border-radius: 0 8px 0 0; }
+  .plan-table td { padding: 11px 12px; border-bottom: 1px solid #f0f0ee; vertical-align: top; color: #333; line-height: 1.5; }
+  .plan-table tr:last-child td { border-bottom: none; }
+  .plan-table tr.latest td { background: #fafcff; }
+  .plan-table tr:hover td { background: #f7f7f5; }
+  .plan-table tr.latest:hover td { background: #f0f6fe; }
+  .plan-table td input, .plan-table td textarea { font-size: 12px; font-family: inherit; color: #333; background: transparent; border: none; outline: none; width: 100%; resize: none; line-height: 1.5; }
+  .plan-table td input:focus, .plan-table td textarea:focus { background: #fff; border-radius: 4px; padding: 2px 5px; outline: 1px solid #91c3f0; }
+  .plan-table { border: 1px solid #e0e0dc; border-radius: 8px; overflow: hidden; }
+  .ver-badge { font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 10px; white-space: nowrap; }
+  .ver-latest { background: #ede9fe; color: #5b3fb5; }
+  .ver-old { background: #efefed; color: #888; }
+  .del-btn { font-size: 13px; color: #ccc; cursor: pointer; padding: 2px 6px; border-radius: 5px; border: none; background: transparent; }
+  .del-btn:hover { color: #e24b4a; background: #fde8e8; }
+  .add-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #aaa; padding: 9px 14px; cursor: pointer; border: 1px dashed #ddd; border-radius: 0 0 8px 8px; border-top: none; background: #fff; }
+  .add-row:hover { background: #f7f7f5; color: #666; }
+
+  /* Status badge */
+  .st-done { background: #e0f5ee; color: #0d6b52; }
+  .st-ip { background: #fdf0d8; color: #a06a00; }
+  .st-pend { background: #efefed; color: #888; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .overview { grid-template-columns: repeat(2, 1fr); }
+    .proc-grid { grid-template-columns: repeat(4, 1fr); }
+    .detail-cols { grid-template-columns: 1fr; }
+    .plan-table th:nth-child(5), .plan-table td:nth-child(5) { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">🗂 신제품 기획 아카이브</div>
+      <div class="page-meta">
+        <span class="badge b-pink">화장품 BM</span>
+        <span class="badge b-teal" id="meta-date">업데이트: 2025.06</span>
+        <span class="badge b-gray" id="meta-count">제품 3종 관리 중</span>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addProduct()">+ 신제품 추가</button>
+  </div>
+
+  <div class="prod-tabs" id="prodTabs"></div>
+  <hr class="div">
+
+  <div class="overview">
+    <div class="ov-card"><div class="ov-label">현재 단계</div><div class="ov-val" id="v-stage"></div><div class="ov-sub" id="v-stagesub"></div></div>
+    <div class="ov-card"><div class="ov-label">목표 출시일</div><div class="ov-val" id="v-date"></div><div class="ov-sub" id="v-dday"></div></div>
+    <div class="ov-card"><div class="ov-label">타겟 가격</div><div class="ov-val" id="v-price"></div><div class="ov-sub" id="v-pnote"></div></div>
+    <div class="ov-card"><div class="ov-label">담당 BM</div><div class="ov-val" style="font-size:15px" id="v-bm"></div><div class="ov-sub" id="v-team"></div></div>
+  </div>
+
+  <div class="sec-label">전체 프로세스</div>
+  <div class="tl-bar" id="tlBar"></div>
+  <div class="proc-grid" id="procGrid"></div>
+  <div class="detail" id="detail"></div>
+
+</div>
+
+<script>
+var data = {
+  products: [
+    {
+      name:"☁️ 수분 세럼 라인", stage:"샘플링", stagesub:"5 / 8 단계",
+      date:"2025.09", dday:"D-94", price:"42,000원", pnote:"30ml 기준", bm:"김지은", team:"스킨케어팀",
+      tl:["done","done","done","done","done","ip","pend","pend"],
+      planVersions:[
+        {ver:"1차",date:"2025.01.15",author:"김지은",summary:"초기 컨셉 설정 — 72시간 수분 지속 앰플 세럼",changes:"타겟 연령 20-35세 설정, 주요 성분 초안 확정",files:"기획안_v1.pptx"},
+        {ver:"2차",date:"2025.02.03",author:"김지은",summary:"성분 보강 및 채널 전략 추가",changes:"히알루론산 단일 → 5종 복합체로 변경, 무신사뷰티 채널 추가",files:"기획안_v2.pptx"},
+        {ver:"3차",date:"2025.02.10",author:"김지은",summary:"가격 포지셔닝 및 타겟 채널 최종 확정",changes:"소비자가 38,000→42,000원 상향, 론칭 채널 우선순위 재정렬",files:"기획안_v3_FINAL.pptx"}
+      ],
+      steps:[
+        {n:"시장조사",s:"done",sl:"완료",fields:[["조사 기간","2024.12~2025.01"],["타겟 시장","20-35세 여성, 수분 케어"],["시장 규모","세럼 시장 약 3,400억 (YoY +12%)"],["주요 경쟁사","A사 히알루론 앰플 외 3종"]],note:"'빠른 흡수'와 '논코메도제닉'이 핵심 구매 요인으로 확인됨.",files:["시장조사_리포트_v2.pdf","경쟁사_벤치마킹.xlsx","소비자_조사_결과.pptx"]},
+        {n:"기획안",s:"done",sl:"완료",planTab:true,fields:[["컨셉","72시간 수분 지속 고보습 앰플 세럼"],["핵심 성분","히알루론산 5종 복합체, 판테놀"],["기획 승인일","2025.02.10"],["타겟 채널","자사몰, 올리브영, 무신사뷰티"]],note:"72시간 수분 지속 임상 결과 확보 필수 — 마케팅 핵심 클레임으로 활용 예정.",files:["기획안_v3_FINAL.pptx","컨셉보드.pdf"]},
+        {n:"개발",s:"done",sl:"완료",fields:[["처방 코드","SRM-2025-047"],["제형","워터-젤 세럼 (저점도)"],["개발사","(주)코스메틱랩"],["처방 확정일","2025.03.15"]],note:"저점도 제형 빠른 흡수 구현 완료. 향료 무첨가.",files:["처방서_SRM-2025-047.pdf","안정성테스트_결과.xlsx"]},
+        {n:"네이밍",s:"done",sl:"완료",fields:[["확정 네임","아쿠아 딥 세럼"],["서브 네임","Aqua Deep Intensive Serum"],["상표 출원","완료 (2025.04 출원)"],["에이전시","(주)네임웍스"]],note:"1차 후보 10종 → 소비자 조사 → 최종 확정.",files:["네이밍_후보안_10종.pptx","상표출원서.pdf"]},
+        {n:"가격",s:"done",sl:"완료",fields:[["소비자가","42,000원 (30ml)"],["원가율","약 28%"],["채널별 공급가","자사몰 100% / 올영 60% / 무신사 65%"],["포지셔닝","프리미엄 매스 (+15%)"]],note:"올리브영 입점 협의 시 마진 리뷰 필요.",files:["가격정책_v2.xlsx","원가분석표.xlsx"]},
+        {n:"샘플링",s:"ip",sl:"진행중",fields:[["1차 샘플","2025.04.20 수령 — 평가 완료"],["2차 샘플","2025.05.30 수령 — 평가 중"],["평가 항목","안정성, 사용감, 흡수력, 향, 외관"],["수정 요청","점도 5% 상향, 향 강도 낮춤"]],note:"2차 샘플 외부 패널 20명 평가 진행 중.",files:["1차샘플_평가보고서.pdf","2차샘플_체크리스트.xlsx"]},
+        {n:"CT/ST",s:"pend",sl:"대기",fields:[["CT 일정","2025.07 예정"],["ST 일정","2025.08 예정"],["시험 기관","(주)코스텍 연구소"],["항목","자극 테스트, 방부력, 안정성"]],note:"CT/ST 기간 약 6주 소요 예정.",files:[]},
+        {n:"론칭",s:"pend",sl:"대기",fields:[["목표 출시일","2025.09"],["론칭 채널","자사몰 선출시 → 올리브영 → 무신사"],["캠페인","인플루언서 30인 협업 기획 중"],["초도 물량","5,000개"]],note:"론칭 캠페인 브리프 작성 예정.",files:[]}
+      ]
+    },
+    {
+      name:"🌿 클렌징 오일", stage:"CT/ST", stagesub:"6 / 8 단계",
+      date:"2025.08", dday:"D-42", price:"28,000원", pnote:"150ml 기준", bm:"박수현", team:"클렌징팀",
+      tl:["done","done","done","done","done","done","ip","pend"],
+      planVersions:[
+        {ver:"1차",date:"2025.01.20",author:"박수현",summary:"클렌징 오일 초기 컨셉 — 비건 포지셔닝",changes:"타겟 시장 25-45세 설정, 비건 인증 방향 결정",files:"클렌징_기획안_v1.pptx"},
+        {ver:"2차",date:"2025.02.28",author:"박수현",summary:"성분 확정 및 채널 전략 보완",changes:"식물성 오일 베이스 확정, 올리브영 단독 선출시 방향으로 수정",files:"클렌징오일_기획안.pptx"}
+      ],
+      steps:[
+        {n:"시장조사",s:"done",sl:"완료",fields:[["조사 기간","2025.01~2025.02"],["타겟 시장","25-45세, 클렌징 효율 중시"],["시장 규모","클렌징 시장 1,800억 (YoY +7%)"],["주요 경쟁사","C사 더블클렌징 오일 외"]],note:"이중세안 트렌드 지속, 피부 자극 최소화 니즈 높음.",files:["클렌징_시장조사.pdf","소비자인터뷰_결과.docx"]},
+        {n:"기획안",s:"done",sl:"완료",planTab:true,fields:[["컨셉","비건 더블클렌징 저자극 클렌징 오일"],["핵심 성분","해바라기씨오일, 선플라워 왁스"],["기획 승인일","2025.02.28"],["타겟 채널","올리브영, 자사몰"]],note:"비건 인증 취득 일정을 개발팀과 사전 합의 필요.",files:["클렌징오일_기획안.pptx"]},
+        {n:"개발",s:"done",sl:"완료",fields:[["처방 코드","CLN-2025-012"],["제형","클리어 오일 타입"],["개발사","(주)그린포뮬라"],["처방 확정일","2025.04.02"]],note:"수세 시 유화력 개선 완료. pH 5.5~6.0 안정 확인.",files:["처방서_CLN-2025-012.pdf"]},
+        {n:"네이밍",s:"done",sl:"완료",fields:[["확정 네임","그린 클렌징 오일"],["서브 네임","Vegan Cleansing Oil"],["상표 출원","완료"],["담당","인하우스"]],note:"비건 포지셔닝을 네임에 직접 반영.",files:["네이밍_결정보고서.pdf"]},
+        {n:"가격",s:"done",sl:"완료",fields:[["소비자가","28,000원 (150ml)"],["원가율","약 32%"],["채널별 공급가","자사몰 100% / 올영 58%"],["포지셔닝","매스 프레스티지"]],note:"경쟁사 대비 8% 저가 설정.",files:["클렌징_가격정책.xlsx"]},
+        {n:"샘플링",s:"done",sl:"완료",fields:[["샘플 상태","최종 샘플 확정 완료"],["확정일","2025.05.15"],["평가 결과","전 항목 통과 (사용감 4.4/5.0)"],["다음 단계","CT/ST 진행 중"]],note:"3차 샘플에서 유화 안정성 최종 확인 완료.",files:["최종샘플_평가보고서.pdf"]},
+        {n:"CT/ST",s:"ip",sl:"진행중",fields:[["CT 결과","진행 중 (2025.06.01 착수)"],["ST 일정","2025.06.20 예정"],["시험 기관","(주)더마테스트"],["항목","피부 자극 테스트, 안정성"]],note:"CT 예비 결과 6/15 수령 예정.",files:["CT_의뢰서.pdf","ST_프로토콜.pdf"]},
+        {n:"론칭",s:"pend",sl:"대기",fields:[["목표 출시일","2025.08"],["론칭 채널","올리브영 선출시"],["캠페인","비건 포지셔닝 SNS 캠페인"],["초도 물량","3,000개"]],note:"올리브영 MD 미팅 6/20 예정.",files:[]}
+      ]
+    },
+    {
+      name:"✨ 선크림 SPF50+", stage:"기획안", stagesub:"1 / 8 단계",
+      date:"2026.02", dday:"D-180", price:"35,000원", pnote:"50ml 기준", bm:"이민아", team:"선케어팀",
+      tl:["done","ip","pend","pend","pend","pend","pend","pend"],
+      planVersions:[
+        {ver:"1차",date:"2025.05.10",author:"이민아",summary:"선크림 초기 컨셉 — 투명 무기자차",changes:"SPF50+ PA++++ 기준 설정, 편의점 채널 검토 시작",files:"선크림_기획초안_v1.pptx"}
+      ],
+      steps:[
+        {n:"시장조사",s:"done",sl:"완료",fields:[["조사 기간","2025.03~2025.04"],["타겟 시장","20-40세, 자외선 차단 기능성 중시"],["시장 규모","선케어 시장 2,100억 (YoY +19%)"],["주요 경쟁사","E사 톤업 선크림, F사 워터선 외"]],note:"'백탁 없는 선크림' 검색량 전년 대비 2.3배 증가.",files:["선케어_트렌드분석.pdf"]},
+        {n:"기획안",s:"ip",sl:"진행중",planTab:true,fields:[["컨셉","투명 선케어 무기자차+유기자차 복합"],["핵심 성분","아연산화물, 티타늄다이옥사이드"],["기획 진행율","60% — 성분 조합 검토 중"],["타겟 채널","미정 (편의점 입점 검토 중)"]],note:"편의점 입점 시 용량 소분 및 단가 재검토 필요.",files:["선크림_기획초안_v1.pptx","성분_레퍼런스.xlsx"]},
+        {n:"개발",s:"pend",sl:"대기",fields:[["처방 코드","미정"],["제형","검토 중"],["개발사","입찰 진행 중 (3사 경쟁)"],["예상 착수","2025.07"]],note:"제형 방향성 확정 후 처방 개발 착수 예정.",files:[]},
+        {n:"네이밍",s:"pend",sl:"대기",fields:[["후보 네임","미정"],["상표 출원","미착수"],["목표 완료","2025.08"],["담당","BM + 마케팅팀 협업"]],note:"기획안 최종 확정 후 네이밍 브리프 작성 예정.",files:[]},
+        {n:"가격",s:"pend",sl:"대기",fields:[["예상 소비자가","35,000원 내외 (50ml)"],["원가율","미정"],["채널","미정"],["포지셔닝","검토 중"]],note:"처방 확정 후 원가 재산정 예정.",files:[]},
+        {n:"샘플링",s:"pend",sl:"대기",fields:[["샘플링 예정","2025.09"],["예상 횟수","2~3회"],["담당 QC","미정"],["상태","대기"]],note:"처방 착수 후 일정 재수립 예정.",files:[]},
+        {n:"CT/ST",s:"pend",sl:"대기",fields:[["상태","대기"],["예정","2025.10 이후"],["시험 기관","미정"],["항목","미정"]],note:"처방 확정 후 CT/ST 기관 선정 예정.",files:[]},
+        {n:"론칭",s:"pend",sl:"대기",fields:[["목표 출시일","2026.02 (예정)"],["론칭 채널","미정"],["캠페인","미정"],["초도 물량","미정"]],note:"기획안 확정 후 전체 일정 수립 예정.",files:[]}
+      ]
+    }
+  ]
+};
+
+var curProd = 0;
+var curStep = 5;
+
+function stepIndexOf(stageName) {
+  var names = ["시장조사","기획안","개발","네이밍","가격","샘플링","CT/ST","론칭"];
+  var i = names.indexOf(stageName);
+  return i >= 0 ? i : 0;
+}
+
+function renderTabs() {
+  var html = data.products.map(function(p, i) {
+    return '<button class="prod-tab' + (i === curProd ? ' on' : '') + '" onclick="selProd(' + i + ')">' + p.name + '</button>';
+  }).join('');
+  document.getElementById('prodTabs').innerHTML = html;
+  document.getElementById('meta-count').textContent = '제품 ' + data.products.length + '종 관리 중';
+}
+
+function renderOverview() {
+  var p = data.products[curProd];
+  document.getElementById('v-stage').textContent = p.stage;
+  document.getElementById('v-stagesub').textContent = p.stagesub;
+  document.getElementById('v-date').textContent = p.date;
+  document.getElementById('v-dday').textContent = p.dday;
+  document.getElementById('v-price').textContent = p.price;
+  document.getElementById('v-pnote').textContent = p.pnote;
+  document.getElementById('v-bm').textContent = p.bm;
+  document.getElementById('v-team').textContent = p.team;
+}
+
+function renderTimeline() {
+  var p = data.products[curProd];
+  document.getElementById('tlBar').innerHTML = p.tl.map(function(t) {
+    var c = t === 'done' ? 'tl-done' : t === 'ip' ? 'tl-ip' : 'tl-pend';
+    return '<div class="tl-seg ' + c + '"></div>';
+  }).join('');
+}
+
+function renderGrid() {
+  var p = data.products[curProd];
+  document.getElementById('procGrid').innerHTML = p.steps.map(function(s, i) {
+    var sc = s.s === 'done' ? 'done' : s.s === 'ip' ? 'ip' : 'pend';
+    var on = i === curStep ? ' on' : '';
+    return '<div class="proc-card ' + sc + on + '" onclick="selStep(' + i + ')">'
+      + '<div class="pc-num">0' + (i+1) + '</div>'
+      + '<div class="pc-name">' + s.n + '</div>'
+      + '<div class="pc-st">' + s.sl + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function renderDetail() {
+  var p = data.products[curProd];
+  var s = p.steps[curStep];
+  var bc = s.s === 'done' ? 'st-done' : s.s === 'ip' ? 'st-ip' : 'st-pend';
+
+  if (s.planTab) {
+    renderPlanDetail(p, s, bc);
+    return;
+  }
+
+  var fhtml = s.files.length ? s.files.map(function(f) {
+    var icon = f.endsWith('.pdf') ? '📄' : f.endsWith('.xlsx') ? '📊' : f.endsWith('.pptx') ? '📋' : '📎';
+    return '<div class="file-item">' + icon + ' ' + f + '<span style="margin-left:auto;font-size:11px;color:#ccc">↓</span></div>';
+  }).join('') : '<div style="font-size:12px;color:#bbb;padding:4px 0">첨부 파일 없음</div>';
+
+  document.getElementById('detail').innerHTML =
+    '<div class="detail-head">'
+    + '<div class="detail-title">0' + (curStep+1) + '. ' + s.n + ' <span class="badge ' + bc + '">' + s.sl + '</span></div>'
+    + '<button class="guide-btn" onclick="alert(\'' + s.n + ' 단계 체크리스트를 Claude에게 요청해보세요!\')">체크리스트 가이드</button>'
+    + '</div>'
+    + '<div class="detail-cols">'
+    + '<div>' + s.fields.map(function(f) {
+      return '<div class="field-box"><div class="field-label">' + f[0] + '</div><div class="field-val">' + f[1] + '</div></div>';
+    }).join('') + '</div>'
+    + '<div>'
+    + '<div class="sec-label" style="margin-bottom:6px">메모</div>'
+    + '<div class="note-box">' + s.note + '</div>'
+    + '<div class="sec-label" style="margin-bottom:6px">첨부 파일</div>'
+    + fhtml
+    + '</div>'
+    + '</div>'
+    + '<div class="action-row">'
+    + '<button class="act-btn" onclick="editNote(' + curStep + ')">✏️ 메모 수정</button>'
+    + '<button class="act-btn" onclick="toggleStatus(' + curStep + ')">🔄 상태 변경</button>'
+    + '</div>';
+}
+
+function renderPlanDetail(p, s, bc) {
+  var vcount = p.planVersions.length;
+  var rows = p.planVersions.map(function(v, i) {
+    var isLatest = i === vcount - 1;
+    return '<tr class="' + (isLatest ? 'latest' : '') + '">'
+      + '<td><span class="ver-badge ' + (isLatest ? 'ver-latest' : 'ver-old') + '">' + v.ver + '</span></td>'
+      + '<td><input value="' + v.date + '" placeholder="YYYY.MM.DD" onchange="updatePlan(' + i + ',\'date\',this.value)" style="width:90px"></td>'
+      + '<td><input value="' + v.author + '" placeholder="작성자" onchange="updatePlan(' + i + ',\'author\',this.value)" style="width:70px"></td>'
+      + '<td><textarea rows="2" onchange="updatePlan(' + i + ',\'summary\',this.value)">' + v.summary + '</textarea>'
+      + '<div style="font-size:11px;color:#aaa;margin-top:4px">↳ ' + v.changes + '</div></td>'
+      + '<td><input value="' + v.files + '" placeholder="파일명.pptx" onchange="updatePlan(' + i + ',\'files\',this.value)" style="font-size:11px;width:110px"></td>'
+      + '<td style="text-align:center"><button class="del-btn" onclick="delPlan(' + i + ')">✕</button></td>'
+      + '</tr>';
+  }).join('');
+
+  document.getElementById('detail').innerHTML =
+    '<div class="detail-head">'
+    + '<div class="detail-title">02. 기획안 <span class="badge ' + bc + '">' + s.sl + '</span> <span style="font-size:12px;color:#aaa;font-weight:400">' + vcount + '차까지 작성됨</span></div>'
+    + '<button class="guide-btn" onclick="alert(\'기획안 필수 항목: 제품 컨셉, 타겟 소비자, 핵심 성분, 포지셔닝, 채널 전략, 경쟁사 분석, 예상 가격대\')">기획안 가이드</button>'
+    + '</div>'
+    + '<div class="sec-label" style="margin-bottom:8px">기획안 버전 히스토리</div>'
+    + '<div class="plan-table-wrap">'
+    + '<table class="plan-table">'
+    + '<thead><tr><th style="width:60px">차수</th><th style="width:100px">작성일</th><th style="width:80px">작성자</th><th>내용 요약 / 변경 사항</th><th style="width:130px">첨부 파일</th><th style="width:50px">삭제</th></tr></thead>'
+    + '<tbody>' + rows + '</tbody>'
+    + '</table>'
+    + '</div>'
+    + '<div class="add-row" onclick="addPlan()">＋ 새 차수 추가</div>'
+    + '<div class="action-row">'
+    + '<button class="act-btn">📋 변경 이력 복사</button>'
+    + '<button class="act-btn" onclick="alert(\'승인 체크리스트:\\n□ 시장 조사 반영 여부\\n□ 경쟁사 분석 완료\\n□ 타겟 명확화\\n□ 채널 전략 확정\\n□ 가격 포지셔닝 검토\\n□ 상위 승인자 사인\')">✅ 승인 체크리스트</button>'
+    + '<button class="act-btn">📌 유의사항</button>'
+    + '</div>';
+}
+
+function updatePlan(i, key, val) {
+  data.products[curProd].planVersions[i][key] = val;
+}
+
+function delPlan(i) {
+  if (confirm((i+1) + '차 기획안을 삭제할까요?')) {
+    data.products[curProd].planVersions.splice(i, 1);
+    renderDetail();
+  }
+}
+
+function addPlan() {
+  var p = data.products[curProd];
+  var n = p.planVersions.length + 1;
+  p.planVersions.push({ver: n + '차', date: '', author: '', summary: '', changes: '', files: ''});
+  renderDetail();
+  setTimeout(function() {
+    var rows = document.querySelectorAll('.plan-table tbody tr');
+    if (rows.length) { var inp = rows[rows.length-1].querySelector('input'); if (inp) inp.focus(); }
+  }, 50);
+}
+
+function editNote(stepIdx) {
+  var s = data.products[curProd].steps[stepIdx];
+  var newNote = prompt('메모를 수정하세요:', s.note);
+  if (newNote !== null) { s.note = newNote; renderDetail(); }
+}
+
+function toggleStatus(stepIdx) {
+  var s = data.products[curProd].steps[stepIdx];
+  var map = {done:'ip', ip:'pend', pend:'done'};
+  var lmap = {done:'완료', ip:'진행중', pend:'대기'};
+  s.s = map[s.s];
+  s.sl = lmap[s.s];
+  data.products[curProd].tl[stepIdx] = s.s;
+  renderAll();
+}
+
+function addProduct() {
+  var name = prompt('새 제품명을 입력하세요 (예: 💄 립 세럼):');
+  if (!name) return;
+  var newProd = JSON.parse(JSON.stringify(data.products[0]));
+  newProd.name = name;
+  newProd.stage = '시장조사';
+  newProd.stagesub = '0 / 8 단계';
+  newProd.date = '';
+  newProd.dday = '';
+  newProd.price = '';
+  newProd.pnote = '';
+  newProd.bm = '';
+  newProd.team = '';
+  newProd.tl = ['pend','pend','pend','pend','pend','pend','pend','pend'];
+  newProd.planVersions = [];
+  newProd.steps.forEach(function(s) { s.s = 'pend'; s.sl = '대기'; s.fields.forEach(function(f){ f[1]=''; }); s.note=''; s.files=[]; });
+  data.products.push(newProd);
+  curProd = data.products.length - 1;
+  curStep = 0;
+  renderAll();
+}
+
+function selProd(i) {
+  curProd = i;
+  curStep = stepIndexOf(data.products[i].stage);
+  renderAll();
+}
+
+function selStep(i) {
+  curStep = i;
+  renderGrid();
+  renderDetail();
+}
+
+function renderAll() {
+  renderTabs();
+  renderOverview();
+  renderTimeline();
+  renderGrid();
+  renderDetail();
+}
+
+renderAll();
+</script>
+</body>
+</html>
